@@ -82,42 +82,44 @@ export default function NewConsultation({ idpaciente, onConsultaAdded, anterior 
   };
 
   const handleSubmit = async (e) => {
-    e.preventDefault();
+  e.preventDefault();
 
-    // Validar que la fecha no esté vacía
-    if (!fecha) {
-      console.error('La fecha no puede estar vacía.');
-      alert('Por favor, selecciona una fecha válida.');
-      return;
-    }
+  // La validación de la fecha ha sido ELIMINADA.
 
-    // Crear un objeto FormData
-    const formData = new FormData();
+    // 1. FILTRAR TRATAMIENTOS VACÍOS: 
+    // Solo se incluyen tratamientos donde el campo 'medicamento' NO esté vacío.
+    const tratamientosAEnviar = tratamientos.filter(tratamiento => 
+        tratamiento.medicamento.trim() !== ''
+    );
 
-    // Agregar los datos de la consulta
-    formData.append('id_paciente', idpaciente);
-    formData.append('diagnostico', diagnostico);
-    formData.append('fecha', fecha); // Asegúrate de que este valor no sea null
-    formData.append('id_consulta_anterior', anterior);
-    formData.append('tratamientos', JSON.stringify(tratamientos));
+  // Crear un objeto FormData
+  const formData = new FormData();
 
-    // Agregar los archivos
-    archivos.forEach((archivo) => {
-      formData.append('archivos[]', archivo); // Usa 'archivos[]' para enviar un array de archivos
-    });
+  // Agregar los datos de la consulta
+  formData.append('id_paciente', idpaciente);
+  formData.append('diagnostico', diagnostico);
+  formData.append('fecha', fecha); 
+  formData.append('id_consulta_anterior', anterior);
+    // IMPORTANTE: Enviamos la lista FILTRADA
+  formData.append('tratamientos', JSON.stringify(tratamientosAEnviar));
 
-    try {
-      // Enviar la solicitud POST con FormData
-      await axios.post(`${config.API_BASE_URL}/consultas`, formData, {
-        headers: {
-          'Content-Type': 'multipart/form-data', // Especifica el tipo de contenido
-        },
-      });
-      onConsultaAdded();
-    } catch (error) {
-      console.error('Error al guardar la consulta y tratamientos:', error);
-    }
-  };
+  // Agregar los archivos
+  archivos.forEach((archivo) => {
+   formData.append('archivos[]', archivo); // Usa 'archivos[]' para enviar un array de archivos
+  });
+
+  try {
+   // Enviar la solicitud POST con FormData
+   await axios.post(`${config.API_BASE_URL}/consultas`, formData, {
+    headers: {
+     'Content-Type': 'multipart/form-data', // Especifica el tipo de contenido
+    },
+   });
+   onConsultaAdded();
+  } catch (error) {
+   console.error('Error al guardar la consulta y tratamientos:', error);
+  }
+ };
 
   useEffect(() => {
     // Establecer una fecha predeterminada en formato YYYY-MM-DD
@@ -175,7 +177,7 @@ export default function NewConsultation({ idpaciente, onConsultaAdded, anterior 
             <TableRow>
               <TableCell>Medicamento</TableCell>
               <TableCell>Dosis</TableCell>
-              <TableCell>Duración</TableCell>
+              <TableCell>Frecuencia</TableCell>
               <TableCell>Observaciones</TableCell>
               <TableCell>Acciones</TableCell>
             </TableRow>

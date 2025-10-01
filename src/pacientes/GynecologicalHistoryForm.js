@@ -116,11 +116,6 @@ const GynecologicalHistoryForm = ({ onNext, onSave, patientData }) => {
           </Box>
         </Box>
       ))}
-      <Box sx={{ display: 'flex', justifyContent: 'flex-end', mt: 2 }}>
-        <Button type="submit" variant="contained" color="primary">
-          Guardar
-        </Button>
-      </Box>
     </Box>
   );
 };
